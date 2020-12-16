@@ -48,7 +48,7 @@ class Forest {
     }
     std::pair<int, int> genLocation(std::pair<int, int> movement) {
         std::pair<int, int> next;
-        next.second = movement.second + slope.second;
+        next.first = movement.first + slope.first;
         next.second = movement.second + slope.second;
         if (next.second >= forest[0].size()) {
             next.second = next.second - forest[0].size();
