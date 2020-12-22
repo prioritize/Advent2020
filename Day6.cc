@@ -36,7 +36,9 @@ class Group {
  public:
     vector<string> in;
     std::map<char, uint32_t> answers;
-    int questions;
+    int groupsize;
+    int questions = 0;;
+    int common = 0;
     explicit Group(vector<string> input) {
         in = input;
         for (auto& line : in) {
@@ -49,6 +51,15 @@ class Group {
             }
         }
         questions = answers.size();
+        groupsize = in.size();
+        checkCommon();
+    }
+    void checkCommon() {
+        for (auto& [key, value] : answers) {
+            if (value == groupsize) {
+                common++;
+            }
+        }
     }
 };
 
@@ -59,9 +70,12 @@ int main() {
         groups.push_back(Group(group));
     }
     int questions = 0;
+    int common = 0;
     for (auto& group : groups) {
         questions = questions + group.questions;
+        common = common + group.common;
     }
     cout << questions << endl;
+    cout << common << endl;
     
 }
