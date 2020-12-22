@@ -28,31 +28,35 @@ class InputParse {
 class Seat {
  public:
     string seatInfo;
-    int col, row, rows, cols;
+    uint32_t col, row;
     string colStr, rowStr;
     int seatID;
-    explicit Seat(string seat, int rows, int cols) {
+    explicit Seat(string seat) {
+        row = 0;
+        col = 0;
         seatInfo = seat;
-        rows = rows;
-        cols = cols;
         rowStr = seatInfo.substr(0, 7);
         colStr = seatInfo.substr(7, 3);
-        row = findRow(0, rows, 0, rowStr);
-        col = findRow(0, cols, 0, colStr);
+        findRow(rowStr);
+        findCol(colStr);
         calcId();
     }
-    int findRow(int min, int max, int iter, string& in) {
-        int range = max - min;
-        if (range == 1) {
-            if (in[iter] == 'F') {
-                return min;
+    int findRow(string& in) {
+        int len = in.size() - 1;
+        for (auto bit : in) {
+            if (bit == 'B') {
+                row |= 1UL << len;
             }
-            return max;
+            len--;
         }
-        if (in[iter] == 'F' | in[iter] == 'L') {
-            return findRow(min, max - ceil(range * 0.5), ++iter, in);
-        } else if (in[iter] == 'B' || in[iter] == 'R') {
-            return findRow(min + ceil(range * 0.5), max, ++iter, in);
+    }
+    int findCol(string& in) {
+        int len = in.size() - 1;
+        for (auto bit : in) {
+            if (bit == 'R') {
+                col |= 1UL << len;
+            }
+            len--;
         }
     }
     void calcId() {
@@ -64,22 +68,18 @@ int main() {
     int maxRow = 127;
     vector<Seat> seats;
     InputParse data("day5seats.txt");
-    Seat mySeat(data.input[0], 127, 7);
     for (auto& line : data.input) {
-        seats.push_back(Seat(line, 127, 7));
+        seats.push_back(Seat(line));
     }
-    int max = 0;
-    for (auto seat : seats) {
-        if (seat.seatID > max) {
-            max = seat.seatID;
-            cout << seat.seatInfo << endl;
-            cout << seat.col << endl;
-            cout << seat.row << endl;
-        }
-        cout << max << endl;
+    std::map<int, bool> elimMap;
+    for (int i = 0; i < 1024; ++i) {
+        elimMap[i] = true;
     }
-    // cout << mySeat.seat << endl;
-    string t("FBFBBFFRLR");
-    Seat testSeat(t, 127, 7);
-    cout << testSeat.row << endl;
+
+    for (auto& seat : seats) {
+        elimMap.erase(seat.seatID);
+    }
+    for (auto [key, value] : elimMap) {
+        cout << key << endl;
+    }
 }
