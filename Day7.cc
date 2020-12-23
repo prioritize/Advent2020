@@ -9,62 +9,60 @@ using std::endl;
 using std::string;
 using std::vector;
 
-
 class InputParse {
  public:
-	std::map<string, int> bagTypes;
-	std::vector<string> input;
-	explicit InputParse(string fname) {
-		std::ifstream inFile(fname);
-		std::stringstream buffer;
-		buffer << inFile.rdbuf();
-		string line;
-		while (getline(buffer, line)) {
-			input.push_back(line);
-		}
-	}
+    std::map<string, int> bagTypes;
+    std::vector<string> input;
+    explicit InputParse(string fname) {
+        std::ifstream inFile(fname);
+        std::stringstream buffer;
+        buffer << inFile.rdbuf();
+        string line;
+        while (getline(buffer, line)) {
+            input.push_back(line);
+        }
+    }
 };
 
 class Bag {
  public:
-	string descriptor;
-	std::map<string, int> bags;
+    string descriptor;
+    std::map<string, int> bags;
     bool hasGold = false;
-	explicit Bag(string bagDef) {
-		std::regex bagMatch("(\\w+\\s\\w+)\\sbags?");
-		std::sregex_iterator currentMatch(bagDef.begin(), bagDef.end(), bagMatch);
-		std::sregex_iterator lastMatch;
+    explicit Bag(string bagDef) {
+        std::regex bagMatch("(\\w+\\s\\w+)\\sbags?");
+        std::sregex_iterator currentMatch(bagDef.begin(), bagDef.end(), bagMatch);
+        std::sregex_iterator lastMatch;
         bool first = true;
-		while (currentMatch != lastMatch) {
-			std::smatch match;
-			match = *currentMatch;
-			if (match.ready()) {
+        while (currentMatch != lastMatch) {
+            std::smatch match;
+            match = *currentMatch;
+            if (match.ready()) {
                 if (first) {
                     descriptor = match[1];
                     first = false;
-                } else {
+                }
+                else {
                     bags[match[1]] = 1;
                 }
-			}
+            }
             bagDef = match.suffix();
             currentMatch++;
-		}
-	}
+        }
+    }
     bool contains(string bag) {
         return bags.contains(bag);
     }
 };
 
-
-
 int main() {
-	InputParse in("day7bags.txt");
-	vector<Bag> rules;
+    InputParse in("day7bags.txt");
+    vector<Bag> rules;
     std::map<string, std::map<string, int>> allBags;
-	std::regex bagMatch("(\\w+\\s\\w+)\\sbags?");
-	for (auto& entry : in.input) {
-		std::sregex_iterator currentMatch(entry.begin(), entry.end(), bagMatch);
-		std::sregex_iterator lastMatch;
+    std::regex bagMatch("(\\w+\\s\\w+)\\sbags?");
+    for (auto &entry : in.input) {
+        std::sregex_iterator currentMatch(entry.begin(), entry.end(), bagMatch);
+        std::sregex_iterator lastMatch;
         string outer;
         int first = true;
         while (currentMatch != lastMatch) {
@@ -82,15 +80,15 @@ int main() {
             }
             currentMatch++;
         }
-	}
+    }
     cout << std::boolalpha;
     std::queue<string> bags;
     string target = "shiny gold";
-    for (auto& [key, value] : allBags[target]) {
+    for (auto &[key, value] : allBags[target]) {
         bags.push(key);
     }
     while (bags.size() > 0) {
-        for (auto& [key, value] : allBags[bags.front()]) {
+        for (auto &[key, value] : allBags[bags.front()]) {
             if (!allBags[target].contains(key)) {
                 allBags[target][key] = 1;
                 bags.push(key);
