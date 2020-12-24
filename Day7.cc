@@ -36,7 +36,11 @@ class Bag {
             std::smatch match = *currentMatch;
             if (match.ready()) {
                 if (match[1].str().size() == 0) {
-                    descriptor = match[3].str();
+                    if (match[3] == "no other") {
+                        bags[match[3].str()] = 0;
+                    } else {
+                        descriptor = match[3].str();
+                    }
                 } else {
                     bags[match[3].str()] = stoi(match[2].str());
                 }
@@ -44,7 +48,6 @@ class Bag {
             currentMatch++;
         }
     }
-    Bag();
 
     bool contains(string bag) {
         return bags.contains(bag);
@@ -69,6 +72,27 @@ int findCombos(string target, std::map<string, std::map<string, int>> allBags) {
     return allBags[target].size();
 }
 // TODO: Satchel class that holds collection of bags and then recurses through them to find the number of bags of each
+class Satchel {
+ public:
+    std::map<string,  Bag> inside;
+    explicit Satchel(InputParse in) {
+        for (auto entry : in.input) {
+            Bag b(entry);
+            // Insert does not call the default constructor, operator[] does!
+            inside.insert({b.descriptor, b});
+        }
+    }
+    int recurse(string target) {
+        int bags = 0;
+        Bag currentBag = inside.at(target);
+        for (auto& [key, value] : currentBag.bags) {
+            if (key == "no other")
+                return 0;
+            bags = bags + value + value * recurse(key);
+        }
+        return bags;
+    }
+};
 
 std::map<string, std::map<string, int>> buildGazinta(vector<string> in) {
     std::map<string, std::map<string, int>> allBags;
@@ -101,11 +125,6 @@ int main() {
     InputParse in("day7bags.txt");
     std::map<string, std::map<string, int>> allBags = buildGazinta(in.input);
     cout << findCombos("shiny gold" , allBags) << endl;
-    std::map<string, Bag> defs;
-    Bag b(in.input[0]);
-    for (auto entry : in.input) {
-        Bag b(entry);
-        // Insert does not call the default constructor, operator[] does!
-        defs.insert({b.descriptor, b});
-    }
+    Satchel satchel(in);
+    cout << satchel.recurse("shiny gold") << endl;
 }
