@@ -28,39 +28,52 @@ class Bag {
  public:
     string descriptor;
     std::map<string, int> bags;
-    bool hasGold = false;
     explicit Bag(string bagDef) {
-        std::regex bagMatch("(\\w+\\s\\w+)\\sbags?");
+        std::regex bagMatch("(([0-9])\\s)?(\\w+\\s\\w+)\\sbags?");
         std::sregex_iterator currentMatch(bagDef.begin(), bagDef.end(), bagMatch);
         std::sregex_iterator lastMatch;
-        bool first = true;
         while (currentMatch != lastMatch) {
-            std::smatch match;
-            match = *currentMatch;
+            std::smatch match = *currentMatch;
             if (match.ready()) {
-                if (first) {
-                    descriptor = match[1];
-                    first = false;
-                }
-                else {
-                    bags[match[1]] = 1;
+                if (match[1].str().size() == 0) {
+                    descriptor = match[3].str();
+                } else {
+                    bags[match[3].str()] = stoi(match[2].str());
                 }
             }
-            bagDef = match.suffix();
             currentMatch++;
         }
     }
+    Bag();
+
     bool contains(string bag) {
         return bags.contains(bag);
     }
 };
+int findCombos(string target, std::map<string, std::map<string, int>> allBags) {
+    cout << std::boolalpha;
+    std::queue<string> bags;
+    for (auto &[key, value] : allBags[target]) {
+        bags.push(key);
+    }
+    while (bags.size() > 0) {
+        for (auto &[key, value] : allBags[bags.front()]) {
+            if (!allBags[target].contains(key)) {
+                allBags[target][key] = 1;
+                bags.push(key);
+                continue;
+            }
+        }
+        bags.pop();
+    }
+    return allBags[target].size();
+}
+// TODO: Satchel class that holds collection of bags and then recurses through them to find the number of bags of each
 
-int main() {
-    InputParse in("day7bags.txt");
-    vector<Bag> rules;
+std::map<string, std::map<string, int>> buildGazinta(vector<string> in) {
     std::map<string, std::map<string, int>> allBags;
     std::regex bagMatch("(\\w+\\s\\w+)\\sbags?");
-    for (auto &entry : in.input) {
+    for (auto &entry : in) {
         std::sregex_iterator currentMatch(entry.begin(), entry.end(), bagMatch);
         std::sregex_iterator lastMatch;
         string outer;
@@ -81,22 +94,18 @@ int main() {
             currentMatch++;
         }
     }
-    cout << std::boolalpha;
-    std::queue<string> bags;
-    string target = "shiny gold";
-    for (auto &[key, value] : allBags[target]) {
-        bags.push(key);
+    return allBags;
+}
+
+int main() {
+    InputParse in("day7bags.txt");
+    std::map<string, std::map<string, int>> allBags = buildGazinta(in.input);
+    cout << findCombos("shiny gold" , allBags) << endl;
+    std::map<string, Bag> defs;
+    Bag b(in.input[0]);
+    for (auto entry : in.input) {
+        Bag b(entry);
+        // Insert does not call the default constructor, operator[] does!
+        defs.insert({b.descriptor, b});
     }
-    while (bags.size() > 0) {
-        for (auto &[key, value] : allBags[bags.front()]) {
-            if (!allBags[target].contains(key)) {
-                allBags[target][key] = 1;
-                bags.push(key);
-                continue;
-            }
-        }
-        bags.pop();
-    }
-    cout << allBags["shiny gold"].size() << endl;
-    cout << endl;
 }
