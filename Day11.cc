@@ -39,6 +39,42 @@ void Seat::genNeighbors(vector<vector<Seat>>& seats) {
         }
     }
 }
+void Seat::sightNeighbors(vector<vector<Seat>>& seats) {
+    neighborCount = 0;
+    cout << row - 1 << " : " << col << endl;
+    neighborCount += seats[row-1][col].look(-1, 0, seats);
+    // neighborCount += seats[row+1][col].look(1, 0, seats);
+    // neighborCount += seats[row][col-1].look(0, -1, seats);
+    // neighborCount += seats[row][col+1].look(0, 1, seats);
+    // neighborCount += seats[row-1][col-1].look(-1, -1, seats);
+    // neighborCount += seats[row-1][col+1].look(-1, 1, seats);
+    // neighborCount += seats[row+1][col+1].look(1, 1, seats);
+    // neighborCount += seats[row+1][col-1].look(1, -1, seats);
+    // !! The error is occuring because Seat::look is checking it's own value
+    // !! It should not care about it's own value when evaluating neighbors.
+}
+int Seat::look(int r_dir, int c_dir, vector<vector<Seat>>& seats) {
+    cout << "look: " << row << " : " << col << endl;
+    cout << r_dir << " : "  << c_dir << endl;
+    if (val == '#') {
+        cout << "found full" << endl;
+        return 1;
+    }
+    if (val == 'L') {
+        cout << "found empty" << endl;
+        return 0;
+    }
+    if (row <= 0 || row >= seats.size() - 1) {
+        cout << "row oob" << endl;
+        return 0;
+    }
+    if (col <= 0 || row >= seats[0].size() - 1) {
+        cout << "col oob" << endl;
+        return 0;
+    }
+    cout << "recursing" << endl;
+    return seats[row + r_dir][col + c_dir].look(r_dir, c_dir, seats);
+}
 void Seat::neighborSum(vector<vector<Seat>>& seats) {
     neighborCount = 0;
     for (auto& seat : neighbors) {
@@ -48,7 +84,7 @@ void Seat::neighborSum(vector<vector<Seat>>& seats) {
     }
 }
 void Seat::modify() {
-    if (this->val == '#' && neighborCount >= 4) {
+    if (this->val == '#' && neighborCount >= 5) {
         this->val = 'L';
         return;
     }
@@ -71,6 +107,16 @@ void checkSums(vector<vector<Seat>>& seats) {
         }
     }
 }
+void checkRecursive(vector<vector<Seat>>& seats) {
+    for (int row = 0; row < seats.size(); row++) {
+        for (int col = 0; col < seats[row].size(); col++) {
+            cout << "checkRecurse -> " << row << " : " << col << endl;
+            seats[row][col].sightNeighbors(seats);
+            cout << "next seat" << endl;
+        }
+    }
+}
+
 void modifySeats(vector<vector<Seat>>& seats) {
     for (int row = 0; row < seats.size(); row++) {
         for (int col = 0; col < seats[row].size(); col++) {
@@ -79,7 +125,7 @@ void modifySeats(vector<vector<Seat>>& seats) {
     }
 }
 void cycle(vector<vector<Seat>>& seats) {
-    checkSums(seats);
+    checkRecursive(seats);
     modifySeats(seats);
 }
 int countSeats(vector<vector<Seat>> seats) {
@@ -106,9 +152,24 @@ int main() {
     }
     genAllNeighbors(seats);
     int count = 0;
-    while (count < 100) {
-        cycle(seats);
-        cout << countSeats(seats) << endl;
-        count++;
+    // while (count < 1000) {
+    //     cycle(seats);
+    //     cout << countSeats(seats) << endl;
+    //     count++;
+    // }
+    cycle(seats);
+    for (auto& row : seats) {
+        for (auto& col : row) {
+            cout << col.val;
+        }
+        cout << endl;
     }
+    cycle(seats);
+    for (auto& row : seats) {
+        for (auto& col : row) {
+            cout << col.val;
+        }
+        cout << endl;
+    }
+
 }

@@ -15,6 +15,8 @@ class Seat {
 
     void genNeighbors(std::vector<std::vector<Seat>>& seats);
     void neighborSum(std::vector<std::vector<Seat>>& seats);
+    void sightNeighbors(std::vector<std::vector<Seat>>& seats);
+    int look(int r_dir, int c_dir, std::vector<std::vector<Seat>>& seats);
     void modify();
 };
 
