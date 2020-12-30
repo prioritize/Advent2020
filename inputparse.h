@@ -6,7 +6,7 @@
 #include <string>
 class InputParse {
  public:
-    std::vector<std::string> input;
+    std::vector<std::vector<char>> input;
     explicit InputParse(std::string fname);
 };
 
