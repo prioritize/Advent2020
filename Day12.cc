@@ -1,5 +1,6 @@
 // Copyright: Jared Leach -- 2020
 
+#include <math.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -34,15 +35,19 @@ class Vessel {
  public:
     int h, v, d;
     char f;
+    pair<int, int> wp;
     vector<pair<char, int>> commands;
     std::map<char, std::map<char, std::map<int, char>>> luTable;
     explicit Vessel(vector<pair<char, int>> in)
-        : h(0), v(0), d(0), f('E'), commands(in), luTable() {}
+        : h(0), v(0), d(0), f('E'), commands(in), luTable(), wp({10, 1}) {}
     void rotate(char dir, int degrees);
     void move(char direction, int offset);
     void fillTable();
     void transit();
+    void rotateVector(char dir, int degrees);
+    void moveWP(char direction, int offset);
 };
+
 void Vessel::fillTable() {
     luTable['E']['L'][90] = 'N';
     luTable['E']['L'][180] = 'W';
@@ -72,47 +77,62 @@ void Vessel::fillTable() {
     luTable['N']['R'][180] = 'S';
     luTable['N']['R'][270] = 'W';
 }
+void Vessel::rotateVector(char dir, int degrees) {
+    pair<int, int> temp;
+    float d = (degrees * M_PI) / 180;
+    float temp1;
+    float temp2;
+    if (dir == 'L') {
+        temp1 = wp.first * cos(d) - wp.second * sin(d);
+        temp2 = wp.first * sin(d) + wp.second * cos(d);
+        wp.first = round(temp1);
+        wp.second = round(temp2);
+    } else if (dir == 'R') {
+        temp1 = wp.first * cos(d) + wp.second * sin(d);
+        temp2 = -wp.first * sin(d) + wp.second * cos(d);
+        wp.first = round(temp1);
+        wp.second = round(temp2);
+    }
+}
 
 void Vessel::rotate(char dir, int degrees) {
-    cout << luTable[f][dir][degrees];
     f = luTable[f][dir][degrees];
-    cout << "forward is: " << f << endl;
 }
 
 void Vessel::move(char direction, int offset) {
     if (direction == 'E') {
-        h += offset;
-        return;
+        wp.first += offset;
     }
     if (direction == 'W') {
-        h -= offset;
-        return;
+        wp.first -= offset;
     }
     if (direction == 'N') {
-        v += offset;
-        return;
+        wp.second += offset;
     }
     if (direction == 'S') {
-        v -= offset;
-        return;
+        wp.second -= offset;
     }
     if (direction == 'F') {
-        move(f, offset);
+        // Move to waypoint
+        h += (wp.first * offset);
+        v += (wp.second * offset);
     }
     if (direction == 'R' || direction == 'L') {
-        rotate(direction, offset);
+        rotateVector(direction, offset);
     }
+}
+void Vessel::moveWP(char direction, int offset) {
+    return;
 }
 void Vessel::transit() {
     for (auto& c : commands) {
         move(c.first, c.second);
     }
-    cout << h << " : " << v << endl;
+    cout << abs(h) + abs(v) << endl;
 }
 int main() {
     InputParse in("day12directions.txt");
     Vessel v(in.helmCommands);
     v.fillTable();
-    cout << v.luTable['E']['L'][270];
     v.transit();
 }
