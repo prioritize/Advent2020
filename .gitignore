@@ -36,4 +36,4 @@
 !*.*
 *.code-workspace
 build/*
-include/googletest/*
+include/googletest/
