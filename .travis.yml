@@ -17,12 +17,12 @@ matrix:
       dist: focal
       sudo: true
       compiler: gcc-10
-      addons:
+      addons: cmake
        apt:
-         packages: &precise_latest_boost_packages
+         packages: 
            - gcc-10
            - g++-10
-         sources: &precise_latest_boost_sources
+         sources: 
            - ubuntu-toolchain-r-test
            - llvm-toolchain-precise-3.7
     
