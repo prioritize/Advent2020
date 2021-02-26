@@ -14,17 +14,16 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Tell CMake that we'll be using Unit Tests
 enable_testing()
 # Include Google Test
-add_subdirectory(googletest)
+add_subdirectory(include/googletest)
 
 set(Headers
-    Example.hpp
-    Day14.hpp
+    include/Day14.hpp
 )
 set(Sources
-    Example.cc
-    Day14.cc
+    src/Day14.cc
 )
 
+set(CMAKE_CXX_FLAGS "-g -Wall")
 add_library(${This} STATIC ${Sources} ${Headers})
 
 
