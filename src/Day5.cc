@@ -1,11 +1,10 @@
 #include <string>
-#include <regex>
 #include <vector>
 #include <fstream>
 #include <iostream>
 #include <math.h>
+#include <sstream>
 
-using std::regex;
 using std::vector;
 using std::string;
 using std::cout;
