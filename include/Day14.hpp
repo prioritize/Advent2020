@@ -37,7 +37,9 @@ class DockingData {
     explicit DockingData(vector<Command> commands);
     void executeCommand();
     void applyMask();
-    void setMemory();
+    void setMask(string inMask);
+    void parseInstruction();
+    void setMemoryLocation(int address, int value);
 };
 
 #endif  // DAY14_HPP_

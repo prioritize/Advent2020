@@ -36,14 +36,6 @@ DockingData::DockingData(vector<Command> commands)
     : commands(commands), instruction(0),
     mask("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX") {}
 
-void DockingData::executeCommand() {
-    Command current = commands[instruction];
-    if (current.type == "mask") {
-        applyMask();
-    } else {
-        setMemory();
-    }
-}
 void DockingData::applyMask() {
     for (uint i = 0; i < commands[instruction].mask.size(); ++i) {
         if (commands[instruction].mask == "X") {
@@ -53,6 +45,29 @@ void DockingData::applyMask() {
         }
     }
 }
-void DockingData::setMemory() {
 
+void DockingData::setMemoryLocation(int address, int value) {
+    // For this function...iterate through the mask,
+    // if there's an x do nothing, if there's a 1 bitshift a 1,
+    // if there's a zero bitshift the zero
+    uint64_t temp = value;
+    for (uint i = 0; i < mask.size(); ++i) {
+        if (mask[i] == 'X') {
+            continue;
+        } else if (mask[i] == '0') {
+            temp &= ~(1 << i);
+        } else if (mask[i] == '1') {
+            temp |= (1 << i);
+        }
+    }
+}
+
+void DockingData::setMask(string inMask) {
+    mask = inMask;
+}
+
+void DockingData::parseInstruction() {
+    if (commands[instruction].type == "mask") {
+        cout << "stuff" << endl;
+    }
 }
