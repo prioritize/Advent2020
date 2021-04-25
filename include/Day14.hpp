@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <regex>
+#include <map>
 
 using std::vector;
 using std::string;
@@ -30,14 +31,18 @@ class InputParse {
 };
 
 class DockingData {
+ private:
+    void increment();
  public:
     vector<Command> commands;
     int instruction;
     string mask;
+    std::map<int, int> memory;
     explicit DockingData(vector<Command> commands);
     void executeCommand();
-    void applyMask();
-    void setMemory();
+    int applyMask(int value);
+    void setMemory(int location, int value);
+    void setMask(string mask);
 };
 
 #endif  // DAY14_HPP_

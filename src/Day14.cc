@@ -32,6 +32,8 @@ InputParse::InputParse(string fname)
         currentMatch++;
     }
 }
+// TODO(Jared): All that is required to complete this problem is a "state" that contains the current mask
+// TODO(Jared): and a map that holds all the values in memory. A function that performs summation may be required as well
 DockingData::DockingData(vector<Command> commands)
     : commands(commands), instruction(0),
     mask("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX") {}
@@ -39,12 +41,14 @@ DockingData::DockingData(vector<Command> commands)
 void DockingData::executeCommand() {
     Command current = commands[instruction];
     if (current.type == "mask") {
-        applyMask();
+        setMask(current.mask);
     } else {
-        setMemory();
+        setMemory(current.address, applyMask(current.value));
     }
 }
-void DockingData::applyMask() {
+// TODO(Jared): Evaluate if this works as expected and then iterate across all the commands
+// TODO(Jared): and then sum and return the value
+int DockingData::applyMask(int value) {
     for (uint i = 0; i < commands[instruction].mask.size(); ++i) {
         if (commands[instruction].mask == "X") {
             continue;
@@ -53,6 +57,12 @@ void DockingData::applyMask() {
         }
     }
 }
-void DockingData::setMemory() {
-
+void DockingData::setMemory(int location, int value) {
+    memory.at(location) = value;
+}
+void DockingData::setMask(string mask) {
+    this->mask = mask;
+}
+void DockingData::increment() {
+    instruction++;
 }
